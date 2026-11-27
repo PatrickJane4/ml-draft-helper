@@ -19,6 +19,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y openjdk-17-jdk unzip curl wget
 
+          JDK17_DIR=$(dirname $(dirname $(readlink -f $(/usr/bin/javac))))
+          if [ ! -d "$JDK17_DIR" ] || [ -d "/usr/lib/jvm/java-17-openjdk-amd64" ]; then
+            JDK17_DIR="/usr/lib/jvm/java-17-openjdk-amd64"
+          fi
+
+          sudo update-java-alternatives -s java-1.17.0-openjdk-amd64 || true
+          echo "JAVA_HOME=$JDK17_DIR" >> $GITHUB_ENV
+          echo "$JDK17_DIR/bin" >> $GITHUB_PATH
+          export JAVA_HOME="$JDK17_DIR"
+          export PATH="$JDK17_DIR/bin:$PATH"
+          java -version
+
           export ANDROID_HOME=$HOME/android-sdk
           export ANDROID_SDK_ROOT=$ANDROID_HOME
           mkdir -p $ANDROID_HOME/cmdline-tools/latest
