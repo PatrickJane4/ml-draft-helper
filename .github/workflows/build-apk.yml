@@ -13,23 +13,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-jdk@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'gradle'
+      - name: Install JDK 17
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openjdk-17-jdk unzip curl
+          java -version
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Generate Gradle Wrapper if missing
+      - name: Setup Gradle Wrapper
         run: |
           if [ ! -f "./gradlew" ]; then
-            gradle wrapper --gradle-version 8.7
+            GRADLE_VERSION="8.7"
+            curl -fsSL "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip" -o /tmp/gradle.zip
+            unzip -q /tmp/gradle.zip -d /tmp/gradle
+            "/tmp/gradle/gradle-${GRADLE_VERSION}/bin/gradle" wrapper --gradle-version "${GRADLE_VERSION}" --distribution-type bin
+            rm -rf /tmp/gradle.zip /tmp/gradle
           fi
           chmod +x gradlew
 
@@ -41,3 +41,4 @@ jobs:
         with:
           name: draft-helper-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
