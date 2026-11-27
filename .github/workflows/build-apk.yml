@@ -19,12 +19,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y openjdk-17-jdk unzip curl wget
 
-          JDK17_DIR=$(dirname $(dirname $(readlink -f $(/usr/bin/javac))))
-          if [ ! -d "$JDK17_DIR" ] || [ -d "/usr/lib/jvm/java-17-openjdk-amd64" ]; then
-            JDK17_DIR="/usr/lib/jvm/java-17-openjdk-amd64"
+          JDK17_DIR="/usr/lib/jvm/java-17-openjdk-amd64"
+          if [ ! -d "$JDK17_DIR" ]; then
+            JDK17_DIR=$(find /usr/lib/jvm -maxdepth 1 -type d -name "*17*" | head -n 1)
           fi
 
-          sudo update-java-alternatives -s java-1.17.0-openjdk-amd64 || true
+          echo "Using JDK17_DIR=$JDK17_DIR"
           echo "JAVA_HOME=$JDK17_DIR" >> $GITHUB_ENV
           echo "$JDK17_DIR/bin" >> $GITHUB_PATH
           export JAVA_HOME="$JDK17_DIR"
